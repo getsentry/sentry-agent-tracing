@@ -16,8 +16,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The oldest supported version, the first with `context_with_system`, and the newest.
-        pi: ["0.87.0", latest]
+        # The oldest supported version, the first with codemode, and the newest.
+        pi: ["0.87.0", "0.99.0", latest]
     steps:
       - uses: actions/checkout@v7.0.1
 
