@@ -10,14 +10,8 @@
     "@types/node": "catalog:",
     "vite-plus": "catalog:"
   },
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "12.8.1",
-      "onFail": "download"
-    }
-  },
   "engines": {
     "node": ">=22.19.0"
-  }
+  },
+  "packageManager": "pnpm@12.8.1"
 }
