@@ -15,14 +15,12 @@ on:
         required: false
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   release:
     name: Prepare a release
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     steps:
       - name: Get a token
         id: token
