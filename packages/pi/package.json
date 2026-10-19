@@ -1,0 +1,52 @@
+{
+  "name": "@sentry/pi",
+  "version": "0.1.0",
+  "description": "Send Pi coding-agent sessions to Sentry as traces and conversations",
+  "keywords": [
+    "observability",
+    "pi-package",
+    "sentry",
+    "tracing"
+  ],
+  "homepage": "https://github.com/getsentry/sentry-agent-tracing/tree/main/packages/pi#readme",
+  "bugs": {
+    "url": "https://github.com/getsentry/sentry-agent-tracing/issues"
+  },
+  "license": "MIT",
+  "author": "Sentry",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/getsentry/sentry-agent-tracing.git",
+    "directory": "packages/pi"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "dev": "vp pack --watch",
+    "e2e": "vp pack && vp test --root e2e"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^1.0.0",
+    "@sentry-internal/agent-tracing-core": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "pi": {
+    "extensions": [
+      "./dist/index.mjs"
+    ]
+  }
+}

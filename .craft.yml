@@ -1,0 +1,33 @@
+minVersion: "2.21.1"
+
+changelog:
+  policy: auto
+
+versioning:
+  policy: auto
+
+# Sets the version of @sentry/pi; Craft's own bump runs npm, which this pnpm repository rejects.
+preReleaseCommand: bash scripts/bump-version.sh
+
+artifactProvider:
+  name: github
+  config:
+    artifacts:
+      CI: npm-package
+
+requireNames:
+  - /^sentry-pi-\d.*\.tgz$/
+
+targets:
+  - name: npm
+    access: public
+    includeNames: /^sentry-pi-\d.*\.tgz$/
+  - name: github
+    includeNames: /^sentry-pi-\d.*\.tgz$/
+  - name: registry
+    sdks:
+      npm:@sentry/pi:
+        name: Sentry Pi Extension
+        sdkName: sentry.agent-tracing.pi
+        packageUrl: https://www.npmjs.com/package/@sentry/pi
+        mainDocsUrl: https://github.com/getsentry/sentry-agent-tracing/tree/main/packages/pi#readme

@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release, or "auto" to pick it from the commits
+        required: false
+        default: auto
+      force:
+        description: Force a release even when there are release blockers
+        required: false
+      merge_target:
+        description: Branch to merge into, the default branch if empty
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Prepare a release
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Get a token
+        id: token
+        uses: actions/create-github-app-token@v3.2.0
+        with:
+          client-id: ${{ vars.SENTRY_RELEASE_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.SENTRY_RELEASE_BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v7.0.1
+        with:
+          token: ${{ steps.token.outputs.token }}
+          fetch-depth: 0
+
+      - name: Prepare the release
+        uses: getsentry/craft@2.34.1
+        env:
+          GITHUB_TOKEN: ${{ steps.token.outputs.token }}
+        with:
+          version: ${{ inputs.version }}
+          force: ${{ inputs.force }}
+          merge_target: ${{ inputs.merge_target }}

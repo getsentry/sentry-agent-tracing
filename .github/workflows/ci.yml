@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main, release/**]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Format, lint and type check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: voidzero-dev/setup-vp@v1.21.1
+        with:
+          node-version: "24"
+          cache: true
+          run-install: true
+
+      - name: Check
+        run: vp check
+
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: voidzero-dev/setup-vp@v1.21.1
+        with:
+          node-version: "24"
+          cache: true
+          run-install: true
+
+      - name: Test
+        run: vp run -r test
+
+  # Craft publishes this tarball when a release is cut.
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: voidzero-dev/setup-vp@v1.21.1
+        with:
+          node-version: "24"
+          cache: true
+          run-install: true
+
+      - name: Build
+        run: vp run --filter @sentry/pi build
+
+      - name: Pack
+        run: vp pm pack --filter @sentry/pi --pack-destination "$RUNNER_TEMP/npm"
+
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: npm-package
+          path: ${{ runner.temp }}/npm/*.tgz
+          if-no-files-found: error

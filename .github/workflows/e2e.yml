@@ -1,0 +1,47 @@
+name: E2E
+
+on:
+  push:
+    branches: [main, release/**]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pi:
+    name: Pi ${{ matrix.pi }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # The oldest supported version, the first with `context_with_system`, and the newest.
+        pi: ["0.87.0", latest]
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: voidzero-dev/setup-vp@v1.21.1
+        with:
+          node-version: "24"
+          cache: true
+          run-install: true
+
+      # Installed with npm, like `pi install` does, rather than using the dev dependency.
+      - name: Install Pi ${{ matrix.pi }}
+        env:
+          PI_VERSION: ${{ matrix.pi }}
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pi" "@earendil-works/pi-coding-agent@$PI_VERSION"
+          echo "PI_BIN=$RUNNER_TEMP/pi/node_modules/.bin/pi" >> "$GITHUB_ENV"
+
+      # Tests the extension as it's published, from the unpacked npm tarball.
+      - name: Pack the extension
+        run: |
+          vp run --filter @sentry/pi build
+          vp pm pack --filter @sentry/pi --pack-destination "$RUNNER_TEMP/npm"
+          tar xzf "$RUNNER_TEMP"/npm/sentry-pi-*.tgz -C "$RUNNER_TEMP/npm"
+          echo "PI_EXTENSION=$RUNNER_TEMP/npm/package" >> "$GITHUB_ENV"
+
+      - name: Run the end-to-end tests
+        run: vp run --filter @sentry/pi e2e
