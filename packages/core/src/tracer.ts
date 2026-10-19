@@ -278,7 +278,8 @@ class SentryTracer implements AgentTracer {
         ...(this.collect.genAI.inputs && {
           [GEN_AI_SYSTEM_INSTRUCTIONS]: event.systemInstructions,
           [GEN_AI_INPUT_MESSAGES]:
-            event.inputMessages && JSON.stringify(recentInput(event.inputMessages)),
+            event.inputMessages &&
+            JSON.stringify(event.inputMessages.filter((message) => message.role !== "system")),
         }),
         [GEN_AI_OUTPUT_MESSAGES]:
           this.collect.genAI.outputs && event.outputMessages
@@ -528,16 +529,6 @@ function addUsage(total: TokenUsage, usage: TokenUsage): void {
       total[key] = (total[key] ?? 0) + value;
     }
   }
-}
-
-/**
- * Per Sentry's agent monitoring spec, a chat span records the messages from the most recent
- * previous model response on, or all of them without one. System instructions have their own
- * attribute.
- */
-function recentInput(messages: GenAiMessage[]): GenAiMessage[] {
-  const lastResponse = messages.findLastIndex((message) => message.role === "assistant");
-  return messages.slice(Math.max(lastResponse, 0)).filter((message) => message.role !== "system");
 }
 
 /** The messages a turn starts with: those after the previous turn's last model response. */

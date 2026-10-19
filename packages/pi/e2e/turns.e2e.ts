@@ -103,11 +103,12 @@ test("a prompt with a tool call becomes one trace", async () => {
     },
   ]);
 
-  // The second request's input starts at the previous model response.
+  // The second request's input has every message the model received.
   const input = messages(second, "input");
-  expect(input).toHaveLength(2);
-  expect(input[0]).toMatchObject({ role: "assistant" });
-  expect(input[1]).toMatchObject({
+  expect(input).toHaveLength(3);
+  expect(input[0]).toEqual({ role: "user", parts: [{ type: "text", content: "Run echo hello" }] });
+  expect(input[1]).toMatchObject({ role: "assistant" });
+  expect(input[2]).toMatchObject({
     role: "tool",
     parts: [{ type: "tool_call_response", name: "bash", result: "hello\n" }],
   });
